@@ -1,128 +1,57 @@
-Com certeza, Jonatas! Aqui está o código final e completo, já com a integração da sua chave da OpenAI, o banco de dados Firebase, o simulador tributário avançado e a interface com ícones na Home.
-
-Basta copiar tudo e substituir no seu arquivo index.html no GitHub.
-
-HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JWD Contadores Associados</title>
+    <title>JWD Contadores - Painel do Cliente</title>
     <style>
-        :root { --primary-color: #0F2B4C; --secondary-color: #1F4E79; --accent-color: #f5f5f5; }
+        :root { --primary: #0F2B4C; --secondary: #1F4E79; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #eef2f5; color: #333; padding-bottom: 80px; }
-        .app-container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; position: relative; }
-        .screen { display: none; padding: 20px; animation: fadeIn 0.4s; }
+        body { background: #eef2f5; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 450px; background: white; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .screen { display: none; padding: 25px; animation: fadeIn 0.4s; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        header { background: var(--primary-color); color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
-        .logo-img { max-width: 150px; background: white; padding: 5px; border-radius: 5px; margin-bottom: 10px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
-        button { width: 100%; padding: 15px; background: var(--secondary-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .bottom-nav { position: fixed; bottom: 0; max-width: 500px; width: 100%; background: white; display: none; justify-content: space-around; padding: 12px 0; border-top: 1px solid #ddd; z-index: 100; }
-        .nav-item { text-align: center; font-size: 11px; color: var(--secondary-color); cursor: pointer; }
-        .nav-item span { display: block; font-size: 22px; }
-        .dashboard-card { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .grid-icones { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        #chat-box { height: 250px; overflow-y: auto; background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px; font-size: 13px; }
+        .logo-img { max-width: 180px; display: block; margin: 20px auto; background: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        input { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; font-size: 16px; }
+        button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: var(--primary); }
+        .card { background: #f8fafc; padding: 20px; border-radius: 15px; border: 1px solid #edf2f7; margin-bottom: 15px; text-align: center; }
+        .nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: white; display: none; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    
     <div id="auth-screen" class="screen active">
-        <center>
-            <img src="https://i.postimg.cc/8z0mXn3N/image-b99160.png" class="logo-img">
-            <h3 id="auth-title">Acessar Painel JWD</h3>
-        </center>
-        <div id="cadastro-fields">
-            <div class="form-group"><label>Nome / Razão Social</label><input type="text" id="reg-nome"></div>
-            <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="reg-id"></div>
-            <div class="form-group"><label>WhatsApp</label><input type="tel" id="reg-tel"></div>
+        <img src="https://i.postimg.cc/8z0mXn3N/image-b99160.png" class="logo-img">
+        <h2 id="auth-title">Criar Conta JWD</h2>
+        <div id="cadastro-extra">
+            <input type="text" id="reg-nome" placeholder="Seu Nome Completo">
+            <input type="text" id="reg-cnpj" placeholder="Seu CNPJ">
         </div>
-        <div class="form-group"><label>E-mail</label><input type="email" id="auth-email"></div>
-        <div class="form-group"><label>Senha (mín. 6 dígitos)</label><input type="password" id="auth-senha"></div>
-        <button id="btn-auth" onclick="handleAuth()">CADASTRAR E ENTRAR</button>
-        <p onclick="toggleAuthMode()" id="toggle-link" style="text-align:center; margin-top:15px; font-size:13px; color:var(--secondary-color); cursor:pointer;">Já possui conta? Entrar</p>
+        <input type="email" id="auth-email" placeholder="Seu E-mail">
+        <input type="password" id="auth-senha" placeholder="Sua Senha (min. 6 dígitos)">
+        <button onclick="handleAuth()">CONFIRMAR ACESSO</button>
+        <p onclick="toggleModo()" id="toggle-text" style="text-align:center; margin-top:20px; color:var(--secondary); cursor:pointer; font-size:14px;">Já tenho cadastro? Entrar agora</p>
     </div>
 
     <div id="home-screen" class="screen">
-        <header>
-            <img src="https://i.postimg.cc/8z0mXn3N/image-b99160.png" class="logo-img">
-            <p id="user-welcome">Bem-vindo!</p>
+        <header style="background:var(--primary); color:white; padding:30px 20px; margin:-25px -25px 25px; border-radius:0 0 25px 25px; text-align:center;">
+            <img src="https://i.postimg.cc/8z0mXn3N/image-b99160.png" class="logo-img" style="max-width:120px; margin-top:0;">
+            <h3 id="user-name">Bem-vindo!</h3>
         </header>
-        <div class="grid-icones">
-            <div class="dashboard-card" onclick="showScreen('das-screen')" style="text-align:center;"><span>📅</span><p>DAS/MEI</p></div>
-            <div class="dashboard-card" onclick="showScreen('simulador-screen')" style="text-align:center;"><span>📊</span><p>Simulador</p></div>
-            <div class="dashboard-card" onclick="showScreen('ia-screen')" style="text-align:center;"><span>🤖</span><p>IA Reforma</p></div>
-            <div class="dashboard-card" onclick="showScreen('diagnostico-screen')" style="text-align:center;"><span>🔍</span><p>Diagnóstico</p></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+            <div class="card">📅<br><strong>DAS MEI</strong></div>
+            <div class="card">🤖<br><strong>IA Reforma</strong></div>
         </div>
-        <div class="dashboard-card"><p id="dash-cnpj" style="font-size:12px; color:#666;"></p></div>
+        <div class="card" style="margin-top:10px;">📊<br><strong>Simulador Tributário</strong></div>
     </div>
 
-    <div id="das-screen" class="screen">
-        <h3>Controle DAS MEI</h3>
-        <label>Selecione o Ano:</label>
-        <select id="select-ano" onchange="carregarStatusMeses()" style="margin-bottom:15px;">
-            <option value="2021">2021</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026" selected>2026</option>
-            <option value="2027">2027</option>
-            <option value="2028">2028</option>
-            <option value="2029">2029</option>
-            <option value="2030">2030</option>
-        </select>
-        <div id="grid-meses" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"></div>
-        <button style="margin-top:20px; background:#27ae60;" onclick="window.open('https://www8.receita.fazenda.gov.br/SimplesNacional/Aplicacoes/ATSPO/pgmei.app/Identificacao', '_blank')">IR PARA SITE RECEITA</button>
-    </div>
-
-    <div id="simulador-screen" class="screen">
-        <h3>Simulador Tributário</h3>
-        <div class="dashboard-card">
-            <label>Tipo de Atividade:</label>
-            <select id="sim-anexo" onchange="calcularSimulacao()">
-                <option value="anexo1">Comércio (Anexo I)</option>
-                <option value="anexo3">Serviços (Anexo III)</option>
-                <option value="anexo4">Serviços (Anexo IV)</option>
-                <option value="anexo5">TI / Engenharia (Anexo V)</option>
-            </select>
-            <label style="margin-top:10px;">Faturamento Mensal (R$):</label><input type="number" id="sim-faturamento" oninput="calcularSimulacao()">
-            <label style="margin-top:10px;">Folha / Pró-labore (R$):</label><input type="number" id="sim-folha" oninput="calcularSimulacao()">
-        </div>
-        <div id="resultado-simulacao" class="dashboard-card" style="display:none; background:#fffbe6; border-top: 4px solid #e67e22;">
-            <p id="res-simples"></p><p id="res-presumido"></p>
-            <hr style="margin:8px 0;">
-            <p id="res-veredito" style="font-weight:bold; color:green;"></p>
-        </div>
-    </div>
-
-    <div id="ia-screen" class="screen">
-        <h3>IA Reforma Tributária</h3>
-        <div id="chat-box"><p><strong>IA JWD:</strong> Olá! O que deseja saber sobre a Reforma Tributária?</p></div>
-        <div style="display:flex; gap:5px;"><input type="text" id="ia-input" placeholder="Sua dúvida..."><button onclick="perguntarIA()" style="width:70px;">OK</button></div>
-    </div>
-
-    <div id="diagnostico-screen" class="screen">
-        <h3>Diagnóstico Gratuito</h3>
-        <form action="https://formspree.io/f/jwdcontadoresassociados@gmail.com" method="POST">
-            <div class="form-group"><label>O que você precisa?</label><textarea name="msg" rows="4" placeholder="Ex: Regularizar CNPJ atrasado..."></textarea></div>
-            <button type="submit">ENVIAR SOLICITAÇÃO</button>
-        </form>
-    </div>
-
-    <div class="bottom-nav" id="main-nav">
-        <div class="nav-item" onclick="showScreen('home-screen')"><span>🏠</span>Home</div>
-        <div class="nav-item" onclick="showScreen('das-screen')"><span>📅</span>DAS</div>
-        <div class="nav-item" onclick="showScreen('simulador-screen')"><span>📊</span>Fiscal</div>
-        <div class="nav-item" onclick="showScreen('ia-screen')"><span>🤖</span>IA</div>
+    <div class="nav" id="main-nav">
+        <div onclick="location.reload()">🏠 Home</div>
+        <div onclick="alert('Funcionalidade em desenvolvimento')">📁 Documentos</div>
     </div>
 </div>
 
@@ -144,115 +73,43 @@ HTML
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let isLoginMode = false;
-
-    window.toggleAuthMode = function() {
-        isLoginMode = !isLoginMode;
-        document.getElementById('cadastro-fields').style.display = isLoginMode ? 'none' : 'block';
-        document.getElementById('auth-title').innerText = isLoginMode ? 'Entrar' : 'Criar Conta';
-        document.getElementById('btn-auth').innerText = isLoginMode ? 'ENTRAR' : 'CADASTRAR';
+    let isLogin = false;
+    window.toggleModo = () => {
+        isLogin = !isLogin;
+        document.getElementById('auth-title').innerText = isLogin ? 'Entrar no Painel' : 'Criar Conta JWD';
+        document.getElementById('cadastro-extra').style.display = isLogin ? 'none' : 'block';
+        document.getElementById('toggle-text').innerText = isLogin ? 'Não tem conta? Cadastrar' : 'Já tenho cadastro? Entrar agora';
     };
 
-    window.handleAuth = async function() {
+    window.handleAuth = async () => {
         const email = document.getElementById('auth-email').value;
         const senha = document.getElementById('auth-senha').value;
         try {
-            if (isLoginMode) { await signInWithEmailAndPassword(auth, email, senha); }
-            else {
-                const userCred = await createUserWithEmailAndPassword(auth, email, senha);
-                await setDoc(doc(db, "clientes", userCred.user.uid), {
+            if(isLogin) {
+                await signInWithEmailAndPassword(auth, email, senha);
+            } else {
+                const cred = await createUserWithEmailAndPassword(auth, email, senha);
+                await setDoc(doc(db, "clientes", cred.user.uid), {
                     nome: document.getElementById('reg-nome').value,
-                    cnpj: document.getElementById('reg-id').value,
-                    whatsapp: document.getElementById('reg-tel').value
+                    cnpj: document.getElementById('reg-cnpj').value
                 });
             }
-        } catch (e) { alert("Erro de Autenticação: Verifique se ativou E-mail/Senha no Console Firebase."); }
+        } catch (e) {
+            alert("Erro: " + e.message + "\nLembre-se de adicionar seu domínio no console do Firebase!");
+        }
     };
 
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const d = await getDoc(doc(db, "clientes", user.uid));
-            if(d.exists()){
-                document.getElementById('user-welcome').innerText = "Olá, " + d.data().nome;
-                document.getElementById('dash-cnpj').innerText = "CNPJ: " + d.data().cnpj;
+        if(user) {
+            const userDoc = await getDoc(doc(db, "clientes", user.uid));
+            if(userDoc.exists()) {
+                document.getElementById('user-name').innerText = "Olá, " + userDoc.data().nome;
             }
-            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('auth-screen').classList.remove('active');
+            document.getElementById('home-screen').classList.add('active');
             document.getElementById('main-nav').style.display = 'flex';
-            showScreen('home-screen');
-            carregarStatusMeses();
         }
     });
-
-    window.showScreen = function(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        window.scrollTo(0,0);
-    };
-
-    // LÓGICA DAS MEI
-    const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-    window.carregarStatusMeses = async function() {
-        const user = auth.currentUser; if(!user) return;
-        const ano = document.getElementById('select-ano').value;
-        const grid = document.getElementById('grid-meses'); grid.innerHTML = "";
-        const ds = await getDoc(doc(db, "pagamentos", `${user.uid}_${ano}`));
-        const pagos = ds.exists() ? ds.data().pagos : [];
-        meses.forEach((m, i) => {
-            const isP = pagos.includes(i);
-            grid.innerHTML += `<div class="dashboard-card" style="display:flex; justify-content:space-between; align-items:center; border-left:5px solid ${isP?'#27ae60':'#e74c3c'}">
-                <span style="font-size:13px; font-weight:bold;">${m}</span>
-                <button onclick="toggleP(${i})" style="width:35px; padding:5px; background:${isP?'#27ae60':'#ccc'}">${isP?'✔':''}</button>
-            </div>`;
-        });
-    };
-    window.toggleP = async function(i) {
-        const ano = document.getElementById('select-ano').value;
-        const ref = doc(db, "pagamentos", `${auth.currentUser.uid}_${ano}`);
-        const ds = await getDoc(ref);
-        let p = ds.exists() ? ds.data().pagos : [];
-        p = p.includes(i) ? p.filter(x => x !== i) : [...p, i];
-        await setDoc(ref, { pagos: p }); carregarStatusMeses();
-    };
-
-    // SIMULADOR
-    window.calcularSimulacao = function() {
-        const fat = parseFloat(document.getElementById('sim-faturamento').value) || 0;
-        const folha = parseFloat(document.getElementById('sim-folha').value) || 0;
-        const anexo = document.getElementById('sim-anexo').value;
-        if(fat <= 0) return;
-        document.getElementById('resultado-simulacao').style.display = 'block';
-        
-        let aliqS = 0.06; if(anexo==='anexo1') aliqS=0.04;
-        if(anexo==='anexo5') aliqS = (folha/fat >= 0.28) ? 0.06 : 0.155;
-        
-        let s = fat * aliqS; if(anexo==='anexo4') s += (folha * 0.20);
-        let p = (fat * 0.1633) + (folha * 0.20);
-        
-        document.getElementById('res-simples').innerText = "Simples Nacional: R$ " + s.toFixed(2);
-        document.getElementById('res-presumido').innerText = "Lucro Presumido: R$ " + p.toFixed(2);
-        document.getElementById('res-veredito').innerText = s < p ? "Melhor Opção: Simples Nacional" : "Melhor Opção: Lucro Presumido";
-    };
-
-    // IA OPENAI
-    window.perguntarIA = async function() {
-        const prompt = document.getElementById('ia-input').value; if(!prompt) return;
-        const chatBox = document.getElementById('chat-box');
-        chatBox.innerHTML += `<p><strong>Você:</strong> ${prompt}</p>`;
-        document.getElementById('ia-input').value = "";
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        try {
-            const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": "Bearer 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" },
-                body: JSON.stringify({ model: "gpt-3.5-turbo", messages: [{role:"system", content:"Você é o assistente da JWD Contadores. Responda sobre Reforma Tributária de forma simples."}, {role:"user", content:prompt}] })
-            });
-            const data = await resp.json();
-            chatBox.innerHTML += `<p style="color:var(--secondary-color);"><strong>IA JWD:</strong> ${data.choices[0].message.content}</p>`;
-        } catch (e) { chatBox.innerHTML += `<p style="color:red;">Erro ao conectar com a IA.</p>`; }
-        chatBox.scrollTop = chatBox.scrollHeight;
-    };
 </script>
 </body>
 </html>
-    

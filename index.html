@@ -3,217 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JWD Contadores</title>
+    <title>JWD Contadores - APK</title>
     <style>
         :root { --primary: #0F2B4C; --secondary: #1F4E79; --accent: #2ecc71; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #eef2f5; display: flex; justify-content: center; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 450px; background: white; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .app-container { width: 100%; max-width: 450px; background: white; min-height: 100vh; position: relative; }
         .screen { display: none; padding: 25px; animation: fadeIn 0.2s; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* Banner de Vencimento */
-        .vencimento-banner { display: none; background: #c0392b; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 13px; }
-
-        /* Header Home */
-        .header-home { background: var(--primary); color: white; padding: 35px 20px; margin: -25px -25px 25px; border-radius: 0 0 35px 35px; text-align: center; }
-        .logo-img { max-width: 110px; display: block; margin: 0 auto 8px; filter: brightness(0) invert(1); }
-        .saudacao { margin-top: 15px; font-size: 18px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
-
-        /* Grid de Navegação */
+        /* Layout */
+        .header-home { background: var(--primary); color: white; padding: 35px 20px; text-align: center; border-radius: 0 0 30px 30px; margin: -25px -25px 25px; }
         .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .card { background: #f8fafc; padding: 22px; border-radius: 18px; border: 1px solid #edf2f7; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .card:active { background: #f1f5f9; transform: scale(0.98); }
-        .card strong { display: block; margin-top: 10px; font-size: 13px; color: var(--primary); }
+        .card { background: #f8fafc; padding: 20px; border-radius: 15px; border: 1px solid #eee; text-align: center; cursor: pointer; }
         
-        /* Formulários e Botões */
-        input, select, textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 12px; font-size: 16px; outline: none; }
-        button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-voltar { background: #64748b; margin-bottom: 20px; padding: 10px 20px; width: auto; font-size: 14px; border-radius: 8px; border: none; color: white; }
+        input, textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 12px; }
+        button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .btn-voltar { background: #64748b; margin-bottom: 20px; width: auto; padding: 10px 20px; color: white; border: none; border-radius: 8px; }
 
-        /* Meses/Flags */
-        .mes-item { background: #f8fafc; padding: 18px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
-        .mes-item span { font-weight: 600; color: var(--primary); cursor: pointer; flex-grow: 1; }
-        .mes-item input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--accent); }
+        /* IA Chat */
+        #chat-log { height: 380px; border: 1px solid #eee; border-radius: 15px; overflow-y: auto; padding: 15px; background: #f9f9f9; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+        .msg { padding: 12px; border-radius: 12px; font-size: 14px; max-width: 85%; line-height: 1.4; }
+        .msg-u { background: var(--secondary); color: white; align-self: flex-end; }
+        .msg-i { background: #e2e8f0; color: #1e293b; align-self: flex-start; }
 
-        /* Chat Log */
-        #chat-log { height: 350px; border: 1px solid #f1f5f9; border-radius: 15px; overflow-y: auto; padding: 15px; margin-bottom: 10px; background: #fdfdfd; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 12px; border-radius: 15px; font-size: 14px; max-width: 85%; line-height: 1.4; }
-        .msg-u { background: var(--secondary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .msg-i { background: #e2e8f0; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 2px; }
+        /* Lista de Meses */
+        .mes-item { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
+        .mes-item span { cursor: pointer; font-weight: bold; color: var(--primary); }
+
+        /* Texto Sobre */
+        .scroll-box { height: 60vh; overflow-y: auto; padding-right: 10px; font-size: 14.5px; line-height: 1.6; text-align: justify; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div id="vencimento-alert" class="vencimento-banner">⚠️ HOJE VENCE O SEU DAS MEI!</div>
-
     <div id="auth-screen" class="screen active">
-        <img src="https://i.postimg.cc/8z0mXn3N/image-b99160.png" style="max-width:140px; display:block; margin:40px auto 20px;">
-        <h2 id="auth-title" style="text-align:center; color:var(--primary); margin-bottom:20px;">Acesso JWD</h2>
-        <div id="cadastro-extra" style="display:none;"><input type="text" id="reg-nome" placeholder="Nome Completo"></div>
-        <input type="email" id="auth-email" placeholder="E-mail">
+        <h2 style="text-align:center; color:var(--primary); margin-top:60px;">Acesso JWD</h2>
+        <input type="email" id="auth-email" placeholder="E-mail" style="margin-top:40px;">
         <input type="password" id="auth-senha" placeholder="Senha">
-        <button id="btn-confirmar">ENTRAR</button>
-        <p id="toggle-auth" style="text-align:center; margin-top:25px; color:var(--secondary); cursor:pointer;">Criar uma conta</p>
+        <button id="btn-entrar">ENTRAR</button>
     </div>
 
     <div id="home-screen" class="screen">
         <header class="header-home">
-            <img src="https://i.postimg.cc/8z0mXn3N/image-b99160.png" class="logo-img">
-            <h3>JWD CONTADORES</h3>
-            <div class="saudacao" id="user-display">Olá, Jonatas</div>
+            <h3 id="user-display">Olá, Jonatas</h3>
         </header>
         <div class="grid-menu">
             <div class="card" onclick="irParaDas()">📅<strong>DAS MEI</strong></div>
-            <div class="card" onclick="irPara('diag-screen')">🔍<strong>Diagnóstico</strong></div>
-            <div class="card" onclick="irPara('serv-screen')">💼<strong>Serviços</strong></div>
             <div class="card" onclick="irPara('ia-screen')">🤖<strong>IA Reforma</strong></div>
             <div class="card" onclick="irPara('sim-screen')">📊<strong>Simulador</strong></div>
+            <div class="card" onclick="irPara('serv-screen')">💼<strong>Serviços</strong></div>
             <div class="card" onclick="irPara('sobre-screen')">ℹ️<strong>Sobre</strong></div>
         </div>
-        <button id="btn-sair" style="margin-top: 40px; background: #b91c1c;">SAIR</button>
-    </div>
-
-    <div id="das-screen" class="screen">
-        <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
-        <h2>Gestão DAS</h2>
-        <div id="meses-container" style="margin-top:15px;"></div>
-    </div>
-
-    <div id="ia-screen" class="screen">
-        <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
-        <h2>IA Reforma</h2>
-        <div id="chat-log"></div>
-        <div style="display:flex; gap:8px;">
-            <input type="text" id="chat-in" placeholder="Dúvida sobre a Reforma?" style="margin:0;">
-            <button onclick="falarIA()" style="width:70px; padding:0;">IR</button>
-        </div>
-    </div>
-
-    <div id="serv-screen" class="screen">
-        <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
-        <h2>Nossos Serviços</h2>
-        <div style="font-size:14.5px; line-height:1.8; color:#334155;">
-            • Abertura e Baixa de MEI<br>• Regularização de CPF e CNPJ<br>• Emissão e Controle de DAS<br>• Folha de Pagamento e Pró-labore<br>• Declaração de IRPF<br>• Consultoria Tributária
-        </div>
-        <div style="margin-top:30px; padding:15px; background:#f1f5f9; border-radius:12px; font-size:13px;">
-            <b>Contato JWD:</b><br>
-            📧 jwdcontadoresassociados@gmail.com<br>
-            💬 Suporte via Diagnóstico no App
-        </div>
-    </div>
-
-    <div id="sim-screen" class="screen">
-        <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
-        <h2>Simulador MEI</h2>
-        <p style="margin-bottom:15px; font-size:14px;">Insira seu faturamento mensal médio:</p>
-        <input type="number" id="s-fat" placeholder="R$ 0,00">
-        <button onclick="simular()">CALCULAR REGIME</button>
-        <div id="s-res" style="margin-top:25px; padding:20px; border-radius:15px; display:none; text-align:center;"></div>
     </div>
 
     <div id="sobre-screen" class="screen">
         <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
-        <h2>Sobre o App</h2>
-        <p style="text-align:justify; font-size:14px; line-height:1.6;">O aplicativo da JWD Contadores Associados nasceu para facilitar a vida de quem empreende, fortalecendo a gestão tributária com inteligência e organização. Desenvolvemos uma solução que une organização e orientação estratégica para apoiar suas decisões empresariais.</p>
+        <h2 style="margin-bottom:15px;">Sobre a JWD</h2>
+        <div class="scroll-box">
+            O aplicativo da <b>JWD Contadores Associados</b> nasceu da prática. Identificamos que muitos micro e pequenos empreendedores, especialmente do MEI e do Simples Nacional, enfrentam dificuldades para acompanhar prazos de pagamento, entender suas obrigações fiscais e avaliar qual regime tributário é mais vantajoso para o seu negócio.<br><br>
+            Essas dificuldades, muitas vezes, resultam em multas, juros e insegurança na gestão. Pensando nisso, desenvolvemos uma solução que une organização, inteligência e orientação estratégica em um único ambiente digital.<br><br>
+            <b>O aplicativo permite:</b><br>
+            • Acompanhar prazos e obrigações fiscais, reduzindo o risco de penalidades;<br>
+            • Simular regimes tributários, auxiliando na escolha mais adequada e econômica dentro da legalidade;<br>
+            • Consultar informações atualizadas sobre a Reforma Tributária por meio de Inteligência Artificial integrada;<br>
+            • Apoiar decisões empresariais com base em dados e enquadramento fiscal.<br><br>
+            A tecnologia foi desenvolvida com foco na simplicidade de uso, refletindo o compromisso da JWD com inovação e responsabilidade fiscal. Nosso propósito é facilitar a vida de quem empreende.
+        </div>
     </div>
 
-    <div id="diag-screen" class="screen">
+    <div id="ia-screen" class="screen">
         <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
-        <h2>Diagnóstico</h2>
-        <input type="text" id="d-tel" placeholder="Telefone com DDD">
-        <textarea id="d-obs" placeholder="Como podemos te ajudar hoje?" rows="5"></textarea>
-        <button onclick="enviarDiag()">SOLICITAR ANÁLISE</button>
+        <div id="chat-log"></div>
+        <div style="display:flex; gap:5px;">
+            <input type="text" id="chat-in" placeholder="Ex: O que é IVA?" style="margin:0;">
+            <button onclick="falarIA()" style="width:60px;">IR</button>
+        </div>
+    </div>
+
+    <div id="das-screen" class="screen">
+        <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
+        <div id="meses-list"></div>
+    </div>
+
+    <div id="sim-screen" class="screen">
+        <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
+        <h2>Simulador</h2>
+        <input type="number" id="s-fat" placeholder="Faturamento Mensal (R$)" style="margin-top:20px;">
+        <button onclick="simular()">CALCULAR</button>
+        <div id="s-res" style="margin-top:20px; padding:15px; border-radius:10px; display:none; text-align:center;"></div>
+    </div>
+
+    <div id="serv-screen" class="screen">
+        <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
+        <h2>Serviços JWD</h2>
+        <div style="margin-top:15px; font-size:14.5px; line-height:1.8;">
+            • Abertura e Baixa de MEI<br>• Regularização de CNPJ<br>• Emissão de DAS<br>• Folha de Pagamento<br>• Imposto de Renda (IRPF)<br>• Consultoria Tributária
+        </div>
+        <div style="margin-top:40px; padding:15px; background:#f1f5f9; border-radius:10px; font-size:12px; text-align:center;">
+            <b>Dúvidas? Entre em contato:</b><br>
+            📧 jwdcontadoresassociados@gmail.com
+        </div>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-    const firebaseConfig = { apiKey: "AIzaSyApe6MwWuHHxbuIjC31c9KQ4XLTrDGDZwg", authDomain: "jwd-contadores-associados.firebaseapp.com", projectId: "jwd-contadores-associados", appId: "1:64194886199:web:4de4b64bc76379b5d75db2" };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    window.irPara = (id) => {
+<script>
+    function irPara(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        window.scrollTo(0,0);
-    };
+    }
 
-    // DAS - Lógica de Instrução
-    window.irParaDas = () => {
-        irPara('das-screen');
-        const container = document.getElementById('meses-container');
-        container.innerHTML = "";
-        const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-        meses.forEach(m => {
-            const div = document.createElement('div');
-            div.className = 'mes-item';
-            div.innerHTML = `<span onclick="alertarDas('${m}')">${m}</span><input type="checkbox">`;
-            container.appendChild(div);
-        });
-    };
-
-    window.alertarDas = (mes) => {
-        const confirmar = confirm(`Para emitir o DAS de ${mes}:\n1. Tenha o CNPJ em mãos.\n2. No portal, selecione 'Emitir Guia'.\n\nDeseja abrir o site da Receita agora?`);
-        if(confirmar) window.open("https://www8.receita.fazenda.gov.br/SimplesNacional/Aplicacoes/ATSPO/pgmei.app/Identificacao", "_blank");
-    };
-
-    // IA - Lógica de Respostas
-    window.falarIA = () => {
-        const txt = document.getElementById('chat-in').value.toLowerCase();
+    // IA COM BASE EXPANDIDA
+    function falarIA() {
+        const input = document.getElementById('chat-in').value.toLowerCase();
         const log = document.getElementById('chat-log');
-        if(!txt) return;
+        if(!input) return;
+        log.innerHTML += `<div class="msg msg-u">${input}</div>`;
         
-        log.innerHTML += `<div class="msg msg-u">${txt}</div>`;
-        let r = "Para detalhes específicos dessa mudança na Reforma, nossa equipe pode realizar um Diagnóstico para você.";
-
-        if(txt.includes("iva")) r = "O IVA unificará impostos como PIS, COFINS e ICMS. O MEI deve manter a organização para essa transição.";
-        else if(txt.includes("split")) r = "O Split Payment fará a retenção do imposto no ato da transação digital. É a maior aposta da Reforma.";
-        else if(txt.includes("pagamento") || txt.includes("pagar")) r = "A Reforma quer simplificar a guia de pagamento, focando na cobrança eletrônica imediata.";
+        let r = "Excelente pergunta! Para detalhes específicos do seu CNAE nessa mudança, consulte nossa equipe.";
+        if(input.includes("iva")) r = "O IVA unificará impostos como PIS, Cofins, IPI, ICMS e ISS em uma única cobrança simplificada.";
+        else if(input.includes("split")) r = "No Split Payment, o imposto é retido automaticamente no momento da transação financeira digital.";
+        else if(input.includes("mei")) r = "O MEI continuará simplificado, mas o valor do DAS e os limites de compra podem sofrer ajustes.";
+        else if(input.includes("cbs")) r = "A CBS (Contribuição sobre Bens e Serviços) é o novo imposto federal que substituirá PIS/Cofins.";
+        else if(input.includes("ibs")) r = "O IBS (Imposto sobre Bens e Serviços) unifica o ICMS estadual e o ISS municipal.";
 
         setTimeout(() => {
             log.innerHTML += `<div class="msg msg-i">${r}</div>`;
             log.scrollTop = log.scrollHeight;
-        }, 500);
+        }, 600);
         document.getElementById('chat-in').value = "";
-    };
+    }
 
-    // Simulador
-    window.simular = () => {
-        const f = parseFloat(document.getElementById('s-fat').value);
+    // DAS COM PASSO A PASSO
+    function irParaDas() {
+        irPara('das-screen');
+        const list = document.getElementById('meses-list');
+        list.innerHTML = "<h2>Gestão DAS</h2><p style='font-size:12px; margin-bottom:15px;'>Selecione o mês para instruções:</p>";
+        ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"].forEach(m => {
+            const item = document.createElement('div');
+            item.className = 'mes-item';
+            item.innerHTML = `<span onclick="alertDas('${m}')">${m}</span><input type="checkbox">`;
+            list.appendChild(item);
+        });
+    }
+
+    function alertDas(mes) {
+        if(confirm(`Passo a passo ${mes}:\n1. Acesse o portal da Receita.\n2. Informe seu CNPJ.\n3. Emita a guia do mês correspondente.\n\nDeseja abrir o portal agora?`)) {
+            window.open("https://www8.receita.fazenda.gov.br/SimplesNacional/Aplicacoes/ATSPO/pgmei.app/Identificacao", "_blank");
+        }
+    }
+
+    // SIMULADOR
+    function simular() {
+        const fat = parseFloat(document.getElementById('s-fat').value);
         const res = document.getElementById('s-res');
-        if(isNaN(f)) return alert("Digite um valor válido");
         res.style.display = "block";
-        if(f > 6750) {
+        if(fat > 6750) {
             res.style.background = "#fee2e2"; res.style.color = "#b91c1c";
-            res.innerHTML = "⚠️ LIMITE EXCEDIDO!<br>Procure a JWD para migrar para ME.";
+            res.innerHTML = "⚠️ <b>Limite Excedido!</b><br>Procure a JWD para migrar para ME.";
         } else {
             res.style.background = "#d1fae5"; res.style.color = "#065f46";
-            res.innerHTML = "✅ TUDO OK!<br>Você está dentro do limite do MEI.";
+            res.innerHTML = "✅ <b>Tudo OK!</b><br>Faturamento dentro do limite MEI.";
         }
-    };
+    }
 
-    window.enviarDiag = () => {
-        alert("Solicitação enviada com sucesso!");
-        document.getElementById('d-tel').value = "";
-        document.getElementById('d-obs').value = "";
-        irPara('home-screen');
-    };
-
-    if(new Date().getDate() === 20) document.getElementById('vencimento-alert').style.display = 'block';
-
-    document.getElementById('btn-confirmar').onclick = () => {
-        const e = document.getElementById('auth-email').value, s = document.getElementById('auth-senha').value;
-        signInWithEmailAndPassword(auth, e, s).catch(() => alert("Acesso negado. Verifique os dados."));
-    };
-
-    onAuthStateChanged(auth, (u) => { if(u) irPara('home-screen'); else irPara('auth-screen'); });
-    document.getElementById('btn-sair').onclick = () => signOut(auth).then(() => location.reload());
+    document.getElementById('btn-entrar').onclick = () => irPara('home-screen');
 </script>
 </body>
 </html>
-

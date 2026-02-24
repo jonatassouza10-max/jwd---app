@@ -1,30 +1,30 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JWD Contadores - Painel do Cliente</title>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root { --primary: #0F2B4C; --secondary: #1F4E79; --accent: #2ecc71; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #eef2f5; display: flex; justify-content: center; min-height: 100vh; }
         .app-container { width: 100%; max-width: 450px; background: white; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        .screen { display: none; padding: 25px; animation: fadeIn 0.4s; }
+        .screen { display: none; padding: 25px; animation: fadeIn 0.3s; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .logo-img { max-width: 150px; display: block; margin: 10px auto; background: white; padding: 10px; border-radius: 10px; }
-        h2 { text-align: center; color: var(--primary); margin-bottom: 5px; }
-        .slogan { text-align: center; color: #666; font-size: 14px; margin-bottom: 20px; display: block; }
-        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; font-size: 16px; }
-        button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 15px; }
+        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-size: 16px; }
+        button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .card { background: #f8fafc; padding: 20px; border-radius: 15px; border: 1px solid #edf2f7; text-align: center; cursor: pointer; }
         .card strong { display: block; margin-top: 10px; font-size: 13px; color: var(--primary); }
-        .mes-item { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
         .btn-voltar { background: #666; margin-bottom: 20px; padding: 10px; width: auto; font-size: 14px; }
-        .texto-sobre { line-height: 1.6; color: #444; text-align: justify; font-size: 15px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; padding: 30px; color: white; overflow-y: auto; }
+        
+        /* Estilos IA e Simulador */
+        #chat-log { height: 200px; border: 1px solid #eee; border-radius: 10px; overflow-y: auto; padding: 10px; margin-bottom: 10px; background: #f9f9f9; }
+        .res-calc { background: var(--primary); color: white; padding: 15px; border-radius: 10px; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
@@ -32,77 +32,65 @@
 <div class="app-container">
     <div id="auth-screen" class="screen active">
         <img src="https://i.postimg.cc/8z0mXn3N/image-b99160.png" class="logo-img">
-        <h2>Acesso JWD</h2>
-        <span class="slogan">seu Guia Contábil</span>
-        <div id="cadastro-extra">
+        <h2 id="auth-title">Acesso JWD</h2>
+        <div id="cadastro-extra" style="display:none;">
             <input type="text" id="reg-nome" placeholder="Nome Completo">
             <input type="text" id="reg-cnpj" placeholder="CNPJ">
         </div>
         <input type="email" id="auth-email" placeholder="E-mail">
         <input type="password" id="auth-senha" placeholder="Senha">
-        <button onclick="handleAuth()">CONFIRMAR</button>
-        <p onclick="toggleModo()" id="toggle-text" style="text-align:center; margin-top:20px; color:var(--secondary); cursor:pointer;">Já tenho cadastro? Entrar agora</p>
+        <button id="btn-confirmar">CONFIRMAR</button>
+        <p id="toggle-auth" style="text-align:center; margin-top:20px; color:var(--secondary); cursor:pointer;">Criar uma conta</p>
     </div>
 
     <div id="home-screen" class="screen">
         <header style="background:var(--primary); color:white; padding:20px; margin:-25px -25px 25px; border-radius:0 0 25px 25px; text-align:center;">
-            <img src="https://i.postimg.cc/8z0mXn3N/image-b99160.png" style="max-width:80px;">
-            <h3 id="user-name">Olá!</h3>
+            <h3 id="user-display">Olá!</h3>
         </header>
         <div class="grid-menu">
             <div class="card" onclick="irParaDas()">📅<strong>DAS MEI</strong></div>
-            <div class="card" onclick="irPara('diag-screen')">🔍<strong>Diagnóstico</strong></div>
-            <div class="card" onclick="alert('Em breve')">🤖<strong>IA Reforma</strong></div>
+            <div class="card" onclick="irPara('ia-screen')">🤖<strong>IA Reforma</strong></div>
+            <div class="card" onclick="irPara('sim-screen')">📊<strong>Simulador</strong></div>
             <div class="card" onclick="irPara('sobre-screen')">ℹ️<strong>Sobre</strong></div>
         </div>
-        <button onclick="auth.signOut(); location.reload();" style="margin-top: 30px; background: #cc3300;">SAIR DO APP</button>
+        <button id="btn-sair" style="margin-top: 30px; background: #cc3300;">SAIR</button>
     </div>
 
     <div id="das-screen" class="screen">
         <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
         <h2>Gestão DAS MEI</h2>
         <select id="ano-ref">
-            <script>
-                for(let a=2021; a<=2030; a++) document.write(`<option value="${a}">${a}</option>`);
-            </script>
+            <script>for(let i=2030; i>=2021; i--) document.write(`<option>${i}</option>`);</script>
         </select>
         <div id="lista-meses"></div>
     </div>
 
-    <div id="diag-screen" class="screen">
+    <div id="ia-screen" class="screen">
         <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
-        <h2>Diagnóstico Especializado</h2>
-        <p style="font-size: 13px; color: #666; margin-bottom: 15px; text-align: center;">Preencha para receber um retorno da nossa equipe.</p>
-        <form id="form-diagnostico">
-            <input type="text" id="diag-nome" placeholder="Nome Completo / Empresa" required>
-            <input type="text" id="diag-doc" placeholder="CPF ou CNPJ" required>
-            <input type="text" id="diag-tel" placeholder="Telefone de Contato" required>
-            <textarea id="diag-necessidade" placeholder="Qual a sua necessidade ou dúvida?" rows="4" required></textarea>
-            <button type="submit" style="background: var(--accent);">ENVIAR PARA JWD</button>
-        </form>
+        <h2>IA Reforma Tributária</h2>
+        <div id="chat-log">Pergunte algo sobre a Reforma...</div>
+        <input type="text" id="chat-input" placeholder="Sua dúvida aqui">
+        <button onclick="perguntarIA()" style="background: var(--accent);">PERGUNTAR</button>
+    </div>
+
+    <div id="sim-screen" class="screen">
+        <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
+        <h2>Simulador Tributário</h2>
+        <input type="number" id="faturamento" placeholder="Faturamento Anual (R$)">
+        <button onclick="calcularSimulador()">SIMULAR</button>
+        <div id="resultado-sim" class="res-calc"></div>
     </div>
 
     <div id="sobre-screen" class="screen">
         <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
         <h2>Sobre o App</h2>
-        <div class="texto-sobre">
-            <p><strong>App JWD Contadores Associados</strong></p>
-            <p>O aplicativo da JWD Contadores Associados nasceu da prática. Identificamos que muitos micro e pequenos empreendedores enfrentam dificuldades para acompanhar prazos e entender obrigações fiscais.</p>
-            <p>Desenvolvemos uma solução que une organização e orientação estratégica. Nosso propósito é facilitar a vida de quem empreende, fortalecendo a gestão tributária com inteligência e organização em um único ambiente digital.</p>
-        </div>
-    </div>
-
-    <div id="modal-instrucoes" class="modal">
-        <button onclick="this.parentElement.style.display='none'" style="background:red; width:auto; padding:5px 15px;">X</button>
-        <h3 style="margin:20px 0;">Como imprimir seu DAS:</h3>
-        <p>1. Acesse o site oficial da Receita.<br>2. Digite seu CNPJ.<br>3. Gere o boleto do mês selecionado.</p>
-        <a href="https://www8.receita.fazenda.gov.br/SimplesNacional/Aplicacoes/ATSPO/pgmei.app/Identificacao" target="_blank" style="display:block; background:var(--accent); color:white; text-align:center; padding:15px; margin-top:20px; border-radius:10px; text-decoration:none;">ABRIR SITE DO GOVERNO</a>
+        <p>Desenvolvemos uma solução que une organização e orientação estratégica para fortalecer a gestão tributária.</p>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -118,58 +106,62 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Inicializar EmailJS (Substitua o 'USER_ID' se você criar uma conta própria)
-    emailjs.init("seu_user_id_aqui"); 
-
-    window.irPara = (t) => {
+    window.irPara = (id) => {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(t).classList.add('active');
+        document.getElementById(id).classList.add('active');
     };
 
-    window.toggleModo = () => {
-        const isLogin = document.getElementById('auth-title').innerText === 'Acesso JWD';
-        document.getElementById('cadastro-extra').style.display = isLogin ? 'block' : 'none';
-        document.getElementById('toggle-text').innerText = isLogin ? 'Já tenho cadastro? Entrar agora' : 'Não tem conta? Cadastrar';
+    document.getElementById('btn-confirmar').onclick = async () => {
+        const email = document.getElementById('auth-email').value;
+        const senha = document.getElementById('auth-senha').value;
+        const modoCadastro = document.getElementById('cadastro-extra').style.display === 'block';
+        try {
+            if(modoCadastro) {
+                const res = await createUserWithEmailAndPassword(auth, email, senha);
+                await setDoc(doc(db, "clientes", res.user.uid), { nome: document.getElementById('reg-nome').value });
+            } else {
+                await signInWithEmailAndPassword(auth, email, senha);
+            }
+        } catch (e) { alert(e.message); }
     };
 
     window.irParaDas = () => {
         irPara('das-screen');
         const lista = document.getElementById('lista-meses');
         lista.innerHTML = "";
-        const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-        meses.forEach(m => {
-            const item = document.createElement('div');
-            item.className = 'mes-item';
-            item.innerHTML = `<div onclick="document.getElementById('modal-instrucoes').style.display='block'"><strong>${m}</strong><br><small>Vencimento 20/mês</small></div>
-                              <input type="checkbox" style="width:20px; height:20px;">`;
-            lista.appendChild(item);
+        ["Janeiro", "Fevereiro", "Março"].forEach(m => {
+            lista.innerHTML += `<div class="mes-item"><strong>${m}</strong><input type="checkbox"></div>`;
         });
     };
 
-    document.getElementById('form-diagnostico').onsubmit = (e) => {
-        e.preventDefault();
-        alert(`Diagnóstico enviado para jwdcontadoresassociados@gmail.com!\n\nDados:\nNome: ${document.getElementById('diag-nome').value}\nDocumento: ${document.getElementById('diag-doc').value}`);
-        irPara('home-screen');
+    window.perguntarIA = () => {
+        const input = document.getElementById('chat-input').value;
+        const log = document.getElementById('chat-log');
+        log.innerHTML += `<p><b>Você:</b> ${input}</p>`;
+        log.innerHTML += `<p><b>IA:</b> A Reforma Tributária simplificará impostos como PIS/COFINS em um único IVA. Para detalhes específicos, consulte nossa equipe via Diagnóstico.</p>`;
+        document.getElementById('chat-input').value = "";
     };
 
-    window.handleAuth = async () => {
-        const email = document.getElementById('auth-email').value;
-        const senha = document.getElementById('auth-senha').value;
-        try {
-            if(document.getElementById('cadastro-extra').style.display === 'none') {
-                await signInWithEmailAndPassword(auth, email, senha);
-            } else {
-                const c = await createUserWithEmailAndPassword(auth, email, senha);
-                await setDoc(doc(db, "clientes", c.user.uid), { nome: document.getElementById('reg-nome').value, cnpj: document.getElementById('reg-cnpj').value });
-            }
-        } catch (e) { alert("Erro: " + e.message); }
+    window.calcularSimulador = () => {
+        const fat = parseFloat(document.getElementById('faturamento').value);
+        const res = document.getElementById('resultado-sim');
+        res.style.display = "block";
+        if(fat <= 81000) {
+            res.innerHTML = "<b>Recomendação: MEI</b><br>Seu faturamento está dentro do limite anual do MEI.";
+        } else {
+            res.innerHTML = "<b>Recomendação: Simples Nacional</b><br>Seu faturamento ultrapassou o limite MEI. Você deve migrar para Microempresa.";
+        }
     };
 
-    onAuthStateChanged(auth, async (u) => {
-        if(u) {
-            const d = await getDoc(doc(db, "clientes", u.uid));
-            if(d.exists()) document.getElementById('user-name').innerText = "Olá, " + d.data().nome;
+    document.getElementById('btn-sair').onclick = () => signOut(auth).then(() => location.reload());
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const snap = await getDoc(doc(db, "clientes", user.uid));
+            if(snap.exists()) document.getElementById('user-display').innerText = "Olá, " + snap.data().nome;
             irPara('home-screen');
+        } else {
+            irPara('auth-screen');
         }
     });
 </script>

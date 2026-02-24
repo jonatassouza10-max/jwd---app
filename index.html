@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JWD Contadores - Painel do Cliente</title>
     <style>
-        :root { --primary: #0F2B4C; --secondary: #1F4E79; }
+        :root { --primary: #0F2B4C; --secondary: #1F4E79; --accent: #2ecc71; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #eef2f5; display: flex; justify-content: center; min-height: 100vh; }
         .app-container { width: 100%; max-width: 450px; background: white; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); padding-bottom: 80px; }
@@ -16,7 +16,6 @@
         h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
         input { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px; font-size: 16px; }
         button { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        button:hover { background: var(--primary); }
         
         /* Grid de Menus */
         .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -24,8 +23,12 @@
         .card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .card strong { display: block; margin-top: 10px; font-size: 14px; color: var(--primary); }
 
+        /* Estilo da área DAS MEI */
+        .das-box { background: var(--primary); color: white; padding: 20px; border-radius: 15px; margin-top: 20px; text-align: center; }
+        .status-badge { background: var(--accent); color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; margin-top: 10px; display: inline-block; }
+
         .nav { position: fixed; bottom: 0; width: 100%; max-width: 450px; background: white; display: none; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; z-index: 100; }
-        .nav div { cursor: pointer; font-size: 14px; color: var(--secondary); font-weight: bold; }
+        .btn-voltar { background: #666; margin-bottom: 10px; padding: 10px; }
     </style>
 </head>
 <body>
@@ -51,16 +54,28 @@
         </header>
         
         <div class="grid-menu">
-            <div class="card" onclick="funcaoEmDesenvolvimento('DAS MEI')">📅<br><strong>DAS MEI</strong></div>
-            <div class="card" onclick="funcaoEmDesenvolvimento('Reforma Tributária')">🤖<br><strong>Reforma Tributária</strong></div>
-            <div class="card" onclick="funcaoEmDesenvolvimento('Simulador Tributário')">📊<br><strong>Simulador Tributário</strong></div>
+            <div class="card" onclick="irPara('das-screen')">📅<br><strong>DAS MEI</strong></div>
+            <div class="card" onclick="alert('Funcionalidade Reforma Tributária sendo preparada.')">🤖<br><strong>Reforma Tributária</strong></div>
+            <div class="card" onclick="alert('Simulador sendo preparado.')">📊<br><strong>Simulador Tributário</strong></div>
             <div class="card" onclick="abrirSobre()">ℹ️<br><strong>Sobre</strong></div>
         </div>
     </div>
 
+    <div id="das-screen" class="screen">
+        <button class="btn-voltar" onclick="irPara('home-screen')">← Voltar</button>
+        <h2>Guia DAS MEI</h2>
+        <div class="das-box">
+            <p>Competência: <strong>Fevereiro/2026</strong></p>
+            <h1 style="margin: 15px 0;">R$ 82,10</h1>
+            <p>Vencimento: 20/03/2026</p>
+            <div class="status-badge">AGUARDANDO PAGAMENTO</div>
+        </div>
+        <button style="margin-top: 20px;" onclick="alert('Copiando linha digitável...')">COPIAR CÓDIGO PIX</button>
+    </div>
+
     <div class="nav" id="main-nav">
-        <div onclick="location.reload()">🏠 Home</div>
-        <div onclick="alert('Área de upload de documentos em desenvolvimento')">📁 Documentos</div>
+        <div onclick="irPara('home-screen')">🏠 Home</div>
+        <div onclick="alert('Área de Documentos')">📁 Documentos</div>
     </div>
 </div>
 
@@ -84,7 +99,11 @@
 
     let isLogin = false;
 
-    // Funções Globais
+    window.irPara = (tela) => {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(tela).classList.add('active');
+    };
+
     window.toggleModo = () => {
         isLogin = !isLogin;
         document.getElementById('auth-title').innerText = isLogin ? 'Entrar no Painel' : 'Criar Conta JWD';
@@ -92,12 +111,8 @@
         document.getElementById('toggle-text').innerText = isLogin ? 'Não tem conta? Cadastrar' : 'Já tenho cadastro? Entrar agora';
     };
 
-    window.funcaoEmDesenvolvimento = (nome) => {
-        alert(`A funcionalidade ${nome} está sendo preparada pela nossa equipe técnica.`);
-    };
-
     window.abrirSobre = () => {
-        alert(`App JWD Contadores Associados\n\nO aplicativo da JWD Contadores Associados nasceu da prática. Identificamos que muitos micro e pequenos empreendedores, especialmente do MEI e do Simples Nacional, enfrentam dificuldades para acompanhar prazos de pagamento, entender suas obrigações fiscais e avaliar qual regime tributário é mais vantajoso para o seu negócio.\n\nEssas dificuldades, muitas vezes, resultam em multas, juros e insegurança na gestão.\n\nPensando nisso, desenvolvemos uma solução que une organização, inteligência e orientação estratégica em um único ambiente digital.\n\nO aplicativo permite:\n• Acompanhar prazos e obrigações fiscais, reduzindo o risco de penalidades\n• Simular regimes tributários, auxiliando na escolha mais adequada e econômica\n• Consultar informações sobre a Reforma Tributária via IA integrada\n• Apoiar decisões empresariais com base em dados.\n\nMais do que uma ferramenta operacional, o app foi criado para proporcionar previsibilidade e segurança ao pequeno empreendedor.`);
+        alert(`App JWD Contadores Associados\n\nO aplicativo da JWD Contadores Associados nasceu da prática. Identificamos que muitos micro e pequenos empreendedores enfrentam dificuldades para acompanhar prazos de pagamento e entender suas obrigações.\n\nDesenvolvemos uma solução que une organização e inteligência em um único ambiente digital.\n\nO propósito é claro: facilitar a vida de quem empreende, reduzindo riscos e fortalecendo a gestão tributária.`);
     };
 
     window.handleAuth = async () => {
@@ -113,19 +128,14 @@
                     cnpj: document.getElementById('reg-cnpj').value
                 });
             }
-        } catch (e) {
-            alert("Erro: " + e.message);
-        }
+        } catch (e) { alert("Erro: " + e.message); }
     };
 
     onAuthStateChanged(auth, async (user) => {
         if(user) {
             const userDoc = await getDoc(doc(db, "clientes", user.uid));
-            if(userDoc.exists()) {
-                document.getElementById('user-name').innerText = "Olá, " + userDoc.data().nome;
-            }
-            document.getElementById('auth-screen').classList.remove('active');
-            document.getElementById('home-screen').classList.add('active');
+            if(userDoc.exists()) document.getElementById('user-name').innerText = "Olá, " + userDoc.data().nome;
+            irPara('home-screen');
             document.getElementById('main-nav').style.display = 'flex';
         }
     });
